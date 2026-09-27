@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  EXPIRED
+  NO_SHOW
+}
+
+enum BookingSource {
+  WEBSITE
+  PHONE
+  PRIVATE
+  WALK_IN
+  ADMIN
+}
+
+enum AdminRole {
+  MANAGER
+  STAFF
+}
+
+model Reservation {
+  id                 String            @id @default(cuid())
+  referenceCode      String            @unique @default(cuid())
+  guestName          String
+  email              String
+  phone              String
+  partySize          Int
+  guestReservationCount Int              @default(1)
+  startsAt           DateTime          @db.Timestamptz(6)
+  endsAt             DateTime          @db.Timestamptz(6)
+  blockedUntil       DateTime          @db.Timestamptz(6)
+  status             ReservationStatus @default(PENDING)
+  bookingSource      BookingSource     @default(WEBSITE)
+  guestNotes         String?
+  staffNotes         String?
+  createdByUserId    String?
+  cancelledAt        DateTime?         @db.Timestamptz(6)
+  cancellationReason String?
+  cancelledByUserId  String?
+  createdAt          DateTime          @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime          @updatedAt @db.Timestamptz(6)
+  createdBy          AdminUser?        @relation("ReservationsCreated", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  cancelledBy        AdminUser?        @relation("ReservationsCancelled", fields: [cancelledByUserId], references: [id], onDelete: SetNull)
+  auditLog           AdminAuditLog[]
+
+  @@index([startsAt])
+  @@index([status, startsAt])
+  @@index([email])
+  @@index([phone])
+  @@index([guestName])
+}
+
+model AvailabilityBlock {
+  id        String   @id @default(cuid())
+  startsAt  DateTime @db.Timestamptz(6)
+  endsAt    DateTime @db.Timestamptz(6)
+  reason    String
+  notes     String?
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  @@unique([startsAt, endsAt, reason])
+  @@index([startsAt, endsAt])
+}
+
+model AdminUser {
+  id                    String          @id @default(cuid())
+  name                  String
+  email                 String          @unique
+  passwordHash          String
+  role                  AdminRole       @default(STAFF)
+  createdAt             DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime        @updatedAt @db.Timestamptz(6)
+  lastLoginAt           DateTime?       @db.Timestamptz(6)
+  reservationsCreated   Reservation[]   @relation("ReservationsCreated")
+  reservationsCancelled Reservation[]   @relation("ReservationsCancelled")
+  auditLog              AdminAuditLog[]
+}
+
+model AdminAuditLog {
+  id            String       @id @default(cuid())
+  adminUserId   String
+  reservationId String?
+  action        String
+  details       Json?
+  createdAt     DateTime     @default(now()) @db.Timestamptz(6)
+  adminUser     AdminUser    @relation(fields: [adminUserId], references: [id], onDelete: Restrict)
+  reservation   Reservation? @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+
+  @@index([adminUserId, createdAt])
+  @@index([reservationId, createdAt])
+}

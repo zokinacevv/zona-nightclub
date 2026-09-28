@@ -125,24 +125,26 @@ export async function sendReservationStatusEmail(
   const settings = config();
   if (!settings) return;
 
-  const resend = new Resend(settings.apiKey);
-  const guestName = escapeHtml(reservation.guestName);
-  const confirmed = status === "CONFIRMED";
-  const manageUrl = confirmed ? cancellationUrl(reservation) : null;
-  const manageButton = manageUrl
-    ? `<p style="margin:26px 0"><a href="${manageUrl}" style="display:inline-block;background:#e32b12;color:#fff;text-decoration:none;padding:13px 18px;font-weight:700">Cancel reservation</a></p>`
-    : "";
-  const reasonText = reason ? `<p><strong>Reason:</strong> ${escapeHtml(reason)}</p>` : "";
+  try {
+    const resend = new Resend(settings.apiKey);
+    const guestName = escapeHtml(reservation.guestName);
+    const confirmed = status === "CONFIRMED";
+    const manageUrl = confirmed ? cancellationUrl(reservation) : null;
+    const manageButton = manageUrl
+      ? `<p style="margin:26px 0"><a href="${manageUrl}" style="display:inline-block;background:#e32b12;color:#fff;text-decoration:none;padding:13px 18px;font-weight:700">Cancel reservation</a></p>`
+      : "";
+    const reasonText = reason ? `<p><strong>Reason:</strong> ${escapeHtml(reason)}</p>` : "";
 
-  const result = await resend.emails.send({
-    from: settings.from,
-    to: [reservation.email],
-    subject: confirmed
-      ? "ZONA reservation confirmed"
-      : "ZONA reservation cancelled",
+    const result = await resend.emails.send({
+      from: settings.from,
+      to: [reservation.email],
+      subject: confirmed ? "ZONA reservation confirmed" : "ZONA reservation cancelled",
       html: emailLayout(confirmed ? "Reservation confirmed" : "Reservation cancelled", `<p style="font-size:18px;margin:0 0 18px">Hi ${guestName}</p><p style="color:#777;margin:0 0 22px">Your ZONA reservation has been <strong style="color:#222">${confirmed ? "confirmed" : "cancelled"}</strong>.</p>${detailsTable(reservation)}${reasonText}${manageButton}`),
-  });
-  if (result.error) console.error("Reservation status email failed", result.error);
+    });
+    if (result.error) console.error("Reservation status email failed", result.error);
+  } catch (error) {
+    console.error("Reservation status email failed", error);
+  }
 }
 
 function logFailures(results: PromiseSettledResult<unknown>[]) {

@@ -1,24 +1,34 @@
 "use client";
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export function ManualReservationForm() {
+  const router = useRouter();
   const [message, setMessage] = useState<string>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setIsSubmitting(true);
+    setMessage(undefined);
     const form = new FormData(event.currentTarget);
-    const response = await fetch("/api/admin/reservations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(Object.fromEntries(form)),
-    });
-    const data = (await response.json()) as {
-      error?: string;
-    };
-    if (response.ok) {
-      window.location.assign("/admin");
-      return;
+    try {
+      const response = await fetch("/api/admin/reservations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(Object.fromEntries(form)),
+      });
+      const data = (await response.json()) as { error?: string };
+      if (response.ok) {
+        router.replace("/admin");
+        router.refresh();
+        return;
+      }
+      setMessage(data.error ?? "Could not create reservation.");
+    } catch {
+      setMessage("Could not connect to the admin server.");
+    } finally {
+      setIsSubmitting(false);
     }
-    setMessage(data.error ?? "Could not create reservation.");
   }
   return (
     <form
@@ -69,9 +79,10 @@ export function ManualReservationForm() {
       </label>
       <button
         className="min-h-11 bg-accent px-5 text-sm font-bold uppercase sm:col-span-2"
+        disabled={isSubmitting}
         type="submit"
       >
-        Create reservation
+        {isSubmitting ? "Creating…" : "Create reservation"}
       </button>
       {message ? (
         <p className="sm:col-span-2" role="status">

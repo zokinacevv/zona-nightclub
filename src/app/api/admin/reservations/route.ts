@@ -30,8 +30,12 @@ export async function POST(request: NextRequest) {
       status: ReservationStatus.CONFIRMED,
       createdByUserId: session.user.id,
     });
-    if (reservation.email) {
-      await sendReservationStatusEmail(reservation, "CONFIRMED");
+    try {
+      if (reservation.email) {
+        await sendReservationStatusEmail(reservation, "CONFIRMED");
+      }
+    } catch (error) {
+      console.error("Manual reservation email failed", error);
     }
     return NextResponse.json({ reservation }, { status: 201 });
   } catch (error) {

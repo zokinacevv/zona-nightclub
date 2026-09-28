@@ -17,7 +17,6 @@ export default async function Page({
             { guestName: { contains: q, mode: "insensitive" } },
             { email: { contains: q, mode: "insensitive" } },
             { phone: { contains: q } },
-            { referenceCode: { contains: q, mode: "insensitive" } },
           ],
         },
         orderBy: { startsAt: "desc" },
@@ -31,7 +30,7 @@ export default async function Page({
           className="min-h-11 flex-1 border bg-surface px-3"
           defaultValue={q}
           name="q"
-          placeholder="Name, phone, email, or reference"
+          placeholder="Name, phone, or email"
         />
         <button className="bg-accent px-5 font-bold uppercase">Search</button>
       </form>
@@ -42,7 +41,6 @@ export default async function Page({
             <p>
               {r.phone} · {r.email} · {r.status}
             </p>
-            <p>{r.referenceCode}</p>
           </article>
         ))}
       </div>

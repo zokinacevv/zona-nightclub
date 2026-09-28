@@ -98,7 +98,6 @@ export async function createWebsiteReservation(
         guestReservationCount: true,
         partySize: true,
         phone: true,
-        referenceCode: true,
         startsAt: true,
         status: true,
         guestCancellationTokenExpiresAt: true,

@@ -13,11 +13,10 @@ export function ManualReservationForm() {
     });
     const data = (await response.json()) as {
       error?: string;
-      reservation?: { referenceCode: string };
     };
     setMessage(
       response.ok
-        ? `Reservation created: ${data.reservation?.referenceCode}`
+        ? "Reservation created successfully."
         : (data.error ?? "Could not create reservation."),
     );
   }

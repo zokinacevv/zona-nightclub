@@ -27,7 +27,7 @@ export async function POST(
       cancelledByUserId: session.user.id,
     },
     select: {
-      id: true, referenceCode: true, guestName: true, email: true, phone: true,
+      id: true, guestName: true, email: true, phone: true,
       partySize: true, guestNotes: true, startsAt: true, endsAt: true,
       status: true, guestCancellationTokenExpiresAt: true,
     },

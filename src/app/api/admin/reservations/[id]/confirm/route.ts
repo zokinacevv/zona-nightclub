@@ -30,7 +30,7 @@ export async function POST(
     where: { id },
     data: { status: "CONFIRMED" },
     select: {
-      id: true, referenceCode: true, guestName: true, email: true, phone: true,
+      id: true, guestName: true, email: true, phone: true,
       partySize: true, guestNotes: true, startsAt: true, endsAt: true,
       status: true, guestCancellationTokenExpiresAt: true,
     },

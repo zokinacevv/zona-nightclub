@@ -17,7 +17,7 @@ export function ReservationForm({ date, durationHours }: ReservationFormProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
-  const [referenceCode, setReferenceCode] = useState<string>();
+  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -56,23 +56,20 @@ export function ReservationForm({ date, durationHours }: ReservationFormProps) {
     });
     const data = (await response.json()) as {
       error?: string;
-      reservation?: { referenceCode: string };
     };
     setIsSubmitting(false);
     if (!response.ok)
       return setError(data.error ?? "Reservation could not be completed.");
-    setReferenceCode(data.reservation?.referenceCode);
+    setSubmitted(true);
   }
 
-  if (referenceCode)
+  if (submitted)
     return (
       <div className="mt-8 border border-white/25 bg-background p-6">
         <p className="text-xs font-bold tracking-[0.18em] text-accent uppercase">
           Reservation received
         </p>
-        <p className="mt-3 text-xl font-semibold">
-          Your reference: {referenceCode}
-        </p>
+        <p className="mt-3 text-xl font-semibold">Reservation request received.</p>
         <p className="mt-2 text-sm text-muted">
           We will send confirmation details to your email.
         </p>

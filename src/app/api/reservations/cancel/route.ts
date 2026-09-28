@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
   const existing = await database.reservation.findUnique({
     where: { id: verified.reservationId },
     select: {
-      id: true, referenceCode: true, guestName: true, email: true, phone: true,
+      id: true, guestName: true, email: true, phone: true,
       partySize: true, guestNotes: true, startsAt: true, endsAt: true,
       status: true, guestCancellationTokenExpiresAt: true,
     },
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       cancellationReason: "Cancelled by guest",
     },
     select: {
-      id: true, referenceCode: true, guestName: true, email: true, phone: true,
+      id: true, guestName: true, email: true, phone: true,
       partySize: true, guestNotes: true, startsAt: true, endsAt: true,
       status: true, guestCancellationTokenExpiresAt: true,
     },

@@ -4,7 +4,6 @@ import { createGuestCancellationToken } from "@/lib/reservations/cancellation";
 
 export type ReservationEmailData = {
   id: string;
-  referenceCode: string;
   guestName: string;
   email: string;
   phone: string;
@@ -62,7 +61,7 @@ function cancellationUrl(reservation: ReservationEmailData) {
 function detailsTable(reservation: ReservationEmailData) {
   const details = reservationDetails(reservation);
   const row = (label: string, value: string) => `<tr><td style="padding:8px 0;color:#777;width:110px">${label}</td><td style="padding:8px 0;font-weight:600">${value}</td></tr>`;
-  return `<table style="width:100%;border-collapse:collapse;margin:22px 0">${row("Date", escapeHtml(details.date))}${row("Time", `${details.startTime}–${details.endTime}`)}${row("Guests", String(reservation.partySize))}${row("Reference", escapeHtml(reservation.referenceCode))}</table>`;
+  return `<table style="width:100%;border-collapse:collapse;margin:22px 0">${row("Date", escapeHtml(details.date))}${row("Time", `${details.startTime}–${details.endTime}`)}${row("Guests", String(reservation.partySize))}</table>`;
 }
 
 function emailLayout(title: string, content: string) {
@@ -97,13 +96,13 @@ export async function sendReservationEmails(reservation: ReservationEmailData) {
     resend.emails.send({
       from: settings.from,
       to: [reservation.email],
-      subject: `ZONA reservation request received · ${reservation.referenceCode}`,
+      subject: "ZONA reservation request received",
       html: emailLayout("Reservation request received", `<p>Hi ${guestName},</p><p>We received your reservation request. It is currently <strong>pending confirmation</strong> from the ZONA team.</p>${detailsTable(reservation)}${manageButton}<p>We will email you again as soon as the reservation is confirmed or cancelled.</p>`),
     }),
     resend.emails.send({
       from: settings.from,
       to: settings.staffRecipients,
-      subject: `New reservation request · ${reservation.referenceCode}`,
+      subject: "New ZONA reservation request",
       html: emailLayout("New reservation request", `<p><strong>${guestName}</strong> submitted a reservation request.</p>${detailsTable(reservation)}<p><strong>Phone:</strong> ${escapeHtml(reservation.phone)}<br><strong>Email:</strong> ${escapeHtml(reservation.email)}<br><strong>Notes:</strong> ${escapeHtml(reservation.guestNotes ?? "None")}</p><p>Open the admin panel to confirm or cancel this reservation.</p>`),
     }),
   ]);
@@ -135,8 +134,8 @@ export async function sendReservationStatusEmail(
     from: settings.from,
     to: [reservation.email],
     subject: confirmed
-      ? `ZONA reservation confirmed · ${reservation.referenceCode}`
-      : `ZONA reservation cancelled · ${reservation.referenceCode}`,
+      ? "ZONA reservation confirmed"
+      : "ZONA reservation cancelled",
     html: emailLayout(confirmed ? "Reservation confirmed" : "Reservation cancelled", `<p>Hi ${guestName},</p><p>Your ZONA reservation has been <strong>${confirmed ? "confirmed" : "cancelled"}</strong>.</p>${detailsTable(reservation)}${reasonText}${manageButton}`),
   });
   if (result.error) console.error("Reservation status email failed", result.error);

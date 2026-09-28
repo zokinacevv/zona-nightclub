@@ -107,7 +107,7 @@ function ReservationList({
                 — {formatInTimeZone(item.endsAt, "Europe/Skopje", "HH:mm")}
               </p>
               <p className="mt-1 text-xs text-muted">
-                {item.referenceCode} · {item.bookingSource.replaceAll("_", " ")} · Guest #{item.guestReservationCount}
+                {item.bookingSource.replaceAll("_", " ")} · Guest #{item.guestReservationCount}
               </p>
               {item.status === "PENDING" ? <ConfirmReservationButton id={item.id} /> : null}
               {item.status !== "CANCELLED" ? <CancelReservationButton id={item.id} /> : null}

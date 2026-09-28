@@ -30,24 +30,6 @@ export function ReservationCta() {
             </p>
           </div>
         </div>
-        <div className="mt-8 flex gap-2">
-            <span className="mr-2 self-center text-sm text-muted">
-            Duration
-          </span>
-          {([2, 3, 4] as const).map((duration) => (
-            <button
-              className={`min-h-10 border px-4 text-sm transition-colors ${duration === durationHours ? "border-accent bg-accent text-white" : "border-white/20 text-muted hover:border-white/50 hover:text-foreground"}`}
-              key={duration}
-              onClick={() => {
-                setDurationHours(duration);
-                setDate(undefined);
-              }}
-              type="button"
-            >
-              {duration}h
-            </button>
-          ))}
-        </div>
         <div className="mt-10 max-w-2xl">
           <ReservationCalendar
             durationHours={durationHours}
@@ -60,6 +42,9 @@ export function ReservationCta() {
             date={date}
             durationHours={durationHours}
             key={`${date}-${durationHours}`}
+            onDurationChange={(duration) => {
+              setDurationHours(duration);
+            }}
           />
         ) : null}
       </div>

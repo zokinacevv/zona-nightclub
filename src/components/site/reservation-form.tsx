@@ -9,9 +9,14 @@ type Slot = { time: string; available: boolean };
 type ReservationFormProps = {
   date: string;
   durationHours: 2 | 3 | 4;
+  onDurationChange: (duration: 2 | 3 | 4) => void;
 };
 
-export function ReservationForm({ date, durationHours }: ReservationFormProps) {
+export function ReservationForm({
+  date,
+  durationHours,
+  onDurationChange,
+}: ReservationFormProps) {
   const [slots, setSlots] = useState<Slot[]>([]);
   const [time, setTime] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -83,8 +88,24 @@ export function ReservationForm({ date, durationHours }: ReservationFormProps) {
     >
       <div>
         <p className="text-sm text-white">
-          {date} · {durationHours}-hour reservation
+          {date}
         </p>
+        <div className="mt-5">
+          <p className="text-sm font-semibold text-white">Duration</p>
+          <div className="mt-3 flex gap-2">
+            {([2, 3, 4] as const).map((duration) => (
+              <button
+                className={`min-h-10 border px-4 text-sm transition-colors ${duration === durationHours ? "border-accent bg-accent text-white" : "border-white/20 text-muted hover:border-white/50 hover:text-foreground"}`}
+                key={duration}
+                onClick={() => onDurationChange(duration)}
+                type="button"
+              >
+                {duration}h
+              </button>
+            ))}
+          </div>
+        </div>
+        <p className="mt-6 text-sm font-semibold text-white">Choose start time</p>
         <div className="mt-3 flex flex-wrap gap-2">
           {isLoading ? (
             <p className="text-sm text-white/70">Loading times…</p>

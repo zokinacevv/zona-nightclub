@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog } from "@/components/ui/dialog";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { cn } from "@/lib/cn";
@@ -35,9 +35,21 @@ const galleryItems = [
 ];
 
 export function Gallery() {
+  const [carouselIndex, setCarouselIndex] = useState(0);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const selectedItem =
     selectedIndex === null ? undefined : galleryItems[selectedIndex];
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setCarouselIndex((current) => (current + 1) % galleryItems.length);
+    }, 4200);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  function carouselIndexAt(offset: number) {
+    return (carouselIndex + offset + galleryItems.length) % galleryItems.length;
+  }
 
   return (
     <section
@@ -62,36 +74,47 @@ export function Gallery() {
           </p>
         </div>
 
-        <div className="mt-12 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3">
-          {galleryItems.map((item, index) => (
-            <button
-              aria-label={`Open photo: ${item.label}`}
-              className={cn(
-                "group relative overflow-hidden bg-surface text-left focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-4 focus-visible:ring-offset-background focus-visible:outline-none",
-                item.className,
-              )}
-              key={item.label}
-              onClick={() => setSelectedIndex(index)}
-              type="button"
-            >
-              <Image
-                alt={item.alt}
-                className="object-cover grayscale transition duration-500 ease-out group-hover:scale-105 group-hover:grayscale-0 motion-reduce:transition-none"
-                fill
-                priority={index === 0}
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 26vw"
-                src={item.src ?? "/images/noir-dancefloor.png"}
-                style={{ objectPosition: item.objectPosition }}
-              />
-              <span className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-75 transition-opacity duration-300 group-hover:opacity-100" />
-              <span className="absolute right-4 bottom-4 left-4 flex items-end justify-between gap-3 text-xs font-bold tracking-[0.14em] text-white uppercase">
-                {item.label}
-                <span className="text-accent transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1">
-                  ↗
-                </span>
-              </span>
-            </button>
-          ))}
+        <div className="relative mx-auto mt-12 h-64 max-w-5xl overflow-hidden sm:h-80 lg:h-96">
+          {[-1, 0, 1].map((offset) => {
+            const index = carouselIndexAt(offset);
+            const item = galleryItems[index];
+            const isActive = offset === 0;
+            return (
+              <button
+                aria-label={`Open photo: ${item.label}`}
+                className={cn(
+                  "group absolute top-0 h-full overflow-hidden bg-surface text-left transition-[left,right,width,opacity,transform] duration-700 ease-in-out focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none",
+                  isActive
+                    ? "left-[13%] w-[74%] opacity-100 sm:left-[18%] sm:w-[64%]"
+                    : offset === -1
+                      ? "left-[-8%] w-[28%] opacity-60 sm:left-[-4%] sm:w-[24%]"
+                      : "right-[-8%] w-[28%] opacity-60 sm:right-[-4%] sm:w-[24%]",
+                )}
+                key={`${item.label}-${offset}`}
+                onClick={() => setSelectedIndex(index)}
+                type="button"
+              >
+                <Image
+                  alt={item.alt}
+                  className="object-cover grayscale transition duration-500 group-hover:grayscale-0 motion-reduce:transition-none"
+                  fill
+                  priority={isActive}
+                  sizes="(max-width: 640px) 74vw, 64vw"
+                  src={item.src ?? "/images/noir-dancefloor.png"}
+                  style={{ objectPosition: item.objectPosition }}
+                />
+                <span className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent" />
+                {isActive ? (
+                  <span className="absolute right-4 bottom-4 left-4 text-sm font-bold tracking-[0.14em] text-white uppercase sm:right-5 sm:bottom-5 sm:left-5">
+                    {item.label}
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
+          <p className="absolute right-1/2 bottom-3 translate-x-1/2 text-[0.65rem] font-bold tracking-[0.2em] text-white/70 uppercase">
+            {String(carouselIndex + 1).padStart(2, "0")} / 04
+          </p>
         </div>
       </div>
 

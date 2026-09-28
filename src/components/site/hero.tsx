@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export function Hero() {
   return (
-    <section className="relative isolate flex min-h-[calc(100svh-4.5rem)] items-end overflow-hidden border-b border-white/10 bg-background">
+    <section className="relative isolate flex min-h-[calc(100svh-4.5rem)] items-start overflow-hidden border-b border-white/10 bg-background lg:items-end">
       <div
         aria-hidden="true"
         className="absolute inset-0 z-0 overflow-hidden"
@@ -26,13 +26,13 @@ export function Hero() {
         <div className="absolute right-[10%] bottom-[17%] h-20 w-20 rounded-full bg-accent/70 blur-[70px]" />
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-5 pt-24 pb-10 sm:px-8 sm:pb-14 lg:px-10 lg:pb-16">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-5 pt-[32svh] pb-10 sm:px-8 sm:pt-[28svh] sm:pb-14 lg:px-10 lg:pt-24 lg:pb-16">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_14rem] lg:items-end">
-          <div>
-            <p className="mb-3 text-sm font-bold tracking-[0.24em] text-accent uppercase sm:text-base">
-              Own the night.
+          <div className="text-center lg:text-left">
+            <p className="mb-3 text-4xl font-black leading-none tracking-[-0.07em] text-foreground uppercase sm:text-5xl">
+              This is
             </p>
-            <h1 className="max-w-5xl text-7xl font-black leading-[0.78] tracking-[-0.095em] text-foreground uppercase sm:text-9xl md:text-[10rem] lg:text-[12rem] xl:text-[14rem]">
+            <h1 className="mx-auto max-w-5xl text-8xl font-black leading-[0.78] tracking-[-0.095em] text-foreground uppercase sm:text-9xl md:text-[10rem] lg:mx-0 lg:text-[12rem] xl:text-[14rem]">
               ZONA
             </h1>
             <p className="mt-5 text-xs font-bold tracking-[0.35em] text-muted uppercase sm:text-sm">
@@ -42,7 +42,7 @@ export function Hero() {
               A private club for great music, late conversations, and nights
               that are only getting started.
             </p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
               <a
                 className="inline-flex min-h-12 items-center justify-center rounded-sm bg-accent px-6 text-sm font-bold tracking-[0.1em] text-white uppercase transition-colors hover:bg-[#ff201a] focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
                 href="#reservations"

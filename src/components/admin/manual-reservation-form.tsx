@@ -14,11 +14,11 @@ export function ManualReservationForm() {
     const data = (await response.json()) as {
       error?: string;
     };
-    setMessage(
-      response.ok
-        ? "Reservation created successfully."
-        : (data.error ?? "Could not create reservation."),
-    );
+    if (response.ok) {
+      window.location.assign("/admin");
+      return;
+    }
+    setMessage(data.error ?? "Could not create reservation.");
   }
   return (
     <form

@@ -75,11 +75,11 @@ function config() {
   const staffRecipients = process.env.RESERVATIONS_STAFF_EMAIL?.split(",")
     .map((email) => email.trim())
     .filter(Boolean);
-  if (!apiKey || !from || !staffRecipients?.length) {
+  if (!apiKey || !from) {
     console.warn("Reservation email not sent: Resend environment variables are missing.");
     return null;
   }
-  return { apiKey, from, staffRecipients };
+  return { apiKey, from, staffRecipients: staffRecipients ?? [] };
 }
 
 export async function sendReservationEmails(reservation: ReservationEmailData) {
@@ -93,20 +93,23 @@ export async function sendReservationEmails(reservation: ReservationEmailData) {
     ? `<p style="margin:26px 0"><a href="${manageUrl}" style="display:inline-block;background:#e32b12;color:#fff;text-decoration:none;padding:13px 18px;font-weight:700">Cancel reservation</a></p><p style="font-size:12px;color:#777">You can use this private link to cancel your request before the reservation time.</p>`
     : "";
 
-  const results = await Promise.allSettled([
+  const emails = [
     resend.emails.send({
       from: settings.from,
       to: [reservation.email],
       subject: "ZONA reservation request received",
       html: emailLayout("Reservation request received", `<p style="font-size:18px;margin:0 0 18px">Hi ${guestName}</p><p style="color:#777;margin:0 0 22px">We received your reservation request. It is currently <strong style="color:#222">pending confirmation</strong>.</p>${detailsTable(reservation)}${manageButton}<p style="color:#777">We will email you again as soon as the reservation is confirmed or cancelled.</p>`),
     }),
-    resend.emails.send({
+  ];
+  if (settings.staffRecipients.length) {
+    emails.push(resend.emails.send({
       from: settings.from,
       to: settings.staffRecipients,
       subject: "New ZONA reservation request",
       html: emailLayout("New reservation request", `<p style="font-size:18px;margin:0 0 18px"><strong>${guestName}</strong></p>${detailsTable(reservation)}<p style="color:#777"><strong>Phone:</strong> ${escapeHtml(reservation.phone)}<br><strong>Email:</strong> ${escapeHtml(reservation.email)}<br><strong>Notes:</strong> ${escapeHtml(reservation.guestNotes ?? "None")}</p><p>Open the admin panel to confirm or cancel this reservation.</p>`),
-    }),
-  ]);
+    }));
+  }
+  const results = await Promise.allSettled(emails);
 
   results.forEach((result) => {
     if (result.status === "rejected")

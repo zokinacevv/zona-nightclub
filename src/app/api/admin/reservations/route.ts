@@ -1,9 +1,10 @@
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { BookingSource } from "@/generated/prisma/client";
+import { BookingSource, ReservationStatus } from "@/generated/prisma/client";
 import { authOptions } from "@/auth";
 import { getDatabase } from "@/lib/database";
 import { createWebsiteReservation } from "@/lib/reservations/create";
+import { sendReservationStatusEmail } from "@/lib/reservations/email";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -26,8 +27,12 @@ export async function POST(request: NextRequest) {
     const reservation = await createWebsiteReservation(getDatabase(), {
       ...body,
       bookingSource: source,
+      status: ReservationStatus.CONFIRMED,
       createdByUserId: session.user.id,
     });
+    if (reservation.email) {
+      await sendReservationStatusEmail(reservation, "CONFIRMED");
+    }
     return NextResponse.json({ reservation }, { status: 201 });
   } catch (error) {
     return NextResponse.json(

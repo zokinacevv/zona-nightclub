@@ -19,6 +19,7 @@ export type CreateWebsiteReservationInput = {
   durationHours: BookingDurationHours;
   guestNotes?: string;
   bookingSource?: BookingSource;
+  status?: ReservationStatus;
   createdByUserId?: string;
 };
 
@@ -85,7 +86,7 @@ export async function createWebsiteReservation(
         bookingSource: input.bookingSource ?? BookingSource.WEBSITE,
         createdByUserId: input.createdByUserId,
         guestNotes: input.guestNotes,
-        status: ReservationStatus.PENDING,
+        status: input.status ?? ReservationStatus.PENDING,
         guestCancellationTokenExpiresAt: window.startsAt,
       },
       select: {

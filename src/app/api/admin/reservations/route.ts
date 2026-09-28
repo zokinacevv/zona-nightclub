@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import { BookingSource, ReservationStatus } from "@/generated/prisma/client";
 import { authOptions } from "@/auth";
 import { getDatabase } from "@/lib/database";
@@ -30,13 +30,15 @@ export async function POST(request: NextRequest) {
       status: ReservationStatus.CONFIRMED,
       createdByUserId: session.user.id,
     });
-    try {
-      if (reservation.email) {
-        await sendReservationStatusEmail(reservation, "CONFIRMED");
+    after(async () => {
+      try {
+        if (reservation.email) {
+          await sendReservationStatusEmail(reservation, "CONFIRMED");
+        }
+      } catch (error) {
+        console.error("Manual reservation email failed", error);
       }
-    } catch (error) {
-      console.error("Manual reservation email failed", error);
-    }
+    });
     return NextResponse.json({ reservation }, { status: 201 });
   } catch (error) {
     return NextResponse.json(

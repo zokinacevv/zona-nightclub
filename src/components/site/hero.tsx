@@ -38,7 +38,7 @@ export function Hero() {
             <p className="mt-5 text-xs font-bold tracking-[0.35em] text-muted uppercase sm:text-sm">
               Private club
             </p>
-            <p className="mt-8 hidden max-w-lg text-base leading-7 text-muted sm:block sm:text-lg">
+            <p className="mt-8 hidden max-w-lg text-base leading-7 text-muted lg:block lg:text-lg">
               A private club for great music, late conversations, and nights
               that are only getting started.
             </p>
@@ -58,7 +58,7 @@ export function Hero() {
             </div>
           </div>
 
-          <div className="hidden border-l border-white/20 pl-5 lg:block lg:pb-2">
+          <div className="hidden border-l border-white/20 pl-5 xl:block xl:pb-2">
             <p className="text-xs font-bold tracking-[0.18em] text-accent uppercase">
               After dark
             </p>

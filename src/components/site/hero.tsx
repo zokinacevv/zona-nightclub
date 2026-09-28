@@ -38,7 +38,7 @@ export function Hero() {
             <p className="mt-5 text-xs font-bold tracking-[0.35em] text-muted uppercase sm:text-sm">
               Private club
             </p>
-            <p className="mt-8 max-w-lg text-base leading-7 text-muted sm:text-lg">
+            <p className="mt-8 hidden max-w-lg text-base leading-7 text-muted sm:block sm:text-lg">
               A private club for great music, late conversations, and nights
               that are only getting started.
             </p>
@@ -58,7 +58,7 @@ export function Hero() {
             </div>
           </div>
 
-          <div className="border-l border-white/20 pl-5 lg:pb-2">
+          <div className="hidden border-l border-white/20 pl-5 lg:block lg:pb-2">
             <p className="text-xs font-bold tracking-[0.18em] text-accent uppercase">
               After dark
             </p>
@@ -74,7 +74,7 @@ export function Hero() {
           </div>
         </div>
 
-        <div className="mt-14 flex items-center gap-4 text-[0.6875rem] font-bold tracking-[0.2em] text-muted uppercase sm:mt-20">
+        <div className="mt-10 hidden items-center gap-4 text-[0.6875rem] font-bold tracking-[0.2em] text-muted uppercase sm:mt-20 sm:flex">
           <span className="h-px flex-1 bg-white/15" />
           Scroll to enter
           <span className="h-px w-8 bg-white/15" />

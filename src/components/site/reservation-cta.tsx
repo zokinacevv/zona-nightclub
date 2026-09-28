@@ -38,13 +38,29 @@ export function ReservationCta() {
           />
         </div>
         {date ? (
+          <div className="mt-8 max-w-2xl border border-white/20 bg-background p-5">
+            <p className="text-xs font-bold tracking-[0.18em] text-accent uppercase">
+              Choose duration
+            </p>
+            <div className="mt-3 flex gap-2">
+              {([2, 3, 4] as const).map((duration) => (
+                <button
+                  className={`min-h-10 border px-4 text-sm transition-colors ${duration === durationHours ? "border-accent bg-accent text-white" : "border-white/20 text-muted hover:border-white/50 hover:text-foreground"}`}
+                  key={duration}
+                  onClick={() => setDurationHours(duration)}
+                  type="button"
+                >
+                  {duration}h
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
+        {date ? (
           <ReservationForm
             date={date}
             durationHours={durationHours}
             key={`${date}-${durationHours}`}
-            onDurationChange={(duration) => {
-              setDurationHours(duration);
-            }}
           />
         ) : null}
       </div>

@@ -47,7 +47,7 @@ export function Hero() {
                 className="inline-flex min-h-12 items-center justify-center rounded-sm bg-accent px-6 text-sm font-bold tracking-[0.1em] text-white uppercase transition-colors hover:bg-[#ff201a] focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
                 href="#reservations"
               >
-                BOOK YOUR NIGHT <span aria-hidden="true">↗</span>
+                BOOK YOUR NIGHT
               </a>
               <a
                 className="inline-flex min-h-12 items-center justify-center rounded-sm border border-white/30 px-6 text-sm font-bold tracking-[0.1em] text-foreground uppercase transition-colors hover:border-foreground hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
@@ -69,7 +69,7 @@ export function Hero() {
               className="mt-5 inline-flex items-center gap-2 text-xs font-bold tracking-[0.14em] text-foreground uppercase transition-colors hover:text-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
               href="#reservations"
             >
-              Book your night <span aria-hidden="true">↗</span>
+              Book your night
             </a>
           </div>
         </div>

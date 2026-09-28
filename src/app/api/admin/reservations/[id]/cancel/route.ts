@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "@/auth";
 import { getDatabase } from "@/lib/database";
+import { sendReservationStatusEmail } from "@/lib/reservations/email";
 
 export async function POST(
   request: NextRequest,
@@ -25,6 +26,16 @@ export async function POST(
       cancellationReason: body.reason.trim(),
       cancelledByUserId: session.user.id,
     },
+    select: {
+      id: true, referenceCode: true, guestName: true, email: true, phone: true,
+      partySize: true, guestNotes: true, startsAt: true, endsAt: true,
+      status: true, guestCancellationTokenExpiresAt: true,
+    },
   });
+  await sendReservationStatusEmail(
+    reservation,
+    "CANCELLED",
+    body.reason.trim(),
+  );
   return NextResponse.json({ reservation });
 }

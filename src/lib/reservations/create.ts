@@ -7,6 +7,7 @@ import {
   createReservationWindow,
   type BookingDurationHours,
 } from "@/lib/reservations/rules";
+import { createGuestCancellationToken } from "@/lib/reservations/cancellation";
 
 export type CreateWebsiteReservationInput = {
   guestName: string;
@@ -71,7 +72,7 @@ export async function createWebsiteReservation(
       throw new ReservationConflictError();
     }
 
-    return transaction.reservation.create({
+    const reservation = await transaction.reservation.create({
       data: {
         guestName: input.guestName,
         email: input.email.toLowerCase(),
@@ -85,8 +86,10 @@ export async function createWebsiteReservation(
         createdByUserId: input.createdByUserId,
         guestNotes: input.guestNotes,
         status: ReservationStatus.PENDING,
+        guestCancellationTokenExpiresAt: window.startsAt,
       },
       select: {
+        id: true,
         blockedUntil: true,
         endsAt: true,
         email: true,
@@ -98,7 +101,18 @@ export async function createWebsiteReservation(
         referenceCode: true,
         startsAt: true,
         status: true,
+        guestCancellationTokenExpiresAt: true,
       },
     });
+
+    return {
+      ...reservation,
+      guestCancellationToken: reservation.guestCancellationTokenExpiresAt
+        ? createGuestCancellationToken(
+            reservation.id,
+            reservation.guestCancellationTokenExpiresAt,
+          )
+        : null,
+    };
   });
 }

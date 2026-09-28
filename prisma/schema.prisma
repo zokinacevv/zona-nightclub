@@ -43,6 +43,7 @@ model Reservation {
   bookingSource      BookingSource     @default(WEBSITE)
   guestNotes         String?
   staffNotes         String?
+  guestCancellationTokenExpiresAt DateTime? @db.Timestamptz(6)
   createdByUserId    String?
   cancelledAt        DateTime?         @db.Timestamptz(6)
   cancellationReason String?

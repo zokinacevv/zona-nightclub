@@ -5,6 +5,7 @@ import { authOptions } from "@/auth";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { getDatabase } from "@/lib/database";
 import { CancelReservationButton } from "@/components/admin/cancel-reservation-button";
+import { ConfirmReservationButton } from "@/components/admin/confirm-reservation-button";
 
 export default async function AdminPage() {
   const session = await getServerSession(authOptions);
@@ -108,9 +109,8 @@ function ReservationList({
               <p className="mt-1 text-xs text-muted">
                 {item.referenceCode} · {item.bookingSource.replaceAll("_", " ")} · Guest #{item.guestReservationCount}
               </p>
-              {item.status !== "CANCELLED" ? (
-                <CancelReservationButton id={item.id} />
-              ) : null}
+              {item.status === "PENDING" ? <ConfirmReservationButton id={item.id} /> : null}
+              {item.status !== "CANCELLED" ? <CancelReservationButton id={item.id} /> : null}
             </article>
           ))
         )}

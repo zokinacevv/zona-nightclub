@@ -122,14 +122,14 @@ function ReservationList({
                 <p className="mt-1 text-xs text-muted">
                   {item.bookingSource.replaceAll("_", " ")} · Guest #{item.guestReservationCount}
                 </p>
-                {item.status === "PENDING" ? (
+                {item.status === "PENDING" || item.status === "CONFIRMED" ? (
                   <>
                     <EditReservationButton
                       id={item.id}
                       startsAt={item.startsAt.toISOString()}
                       endsAt={item.endsAt.toISOString()}
                     />
-                    <ConfirmReservationButton id={item.id} />
+                    {item.status === "PENDING" ? <ConfirmReservationButton id={item.id} /> : null}
                   </>
                 ) : null}
                 {item.status !== "CANCELLED" ? <CancelReservationButton id={item.id} /> : null}

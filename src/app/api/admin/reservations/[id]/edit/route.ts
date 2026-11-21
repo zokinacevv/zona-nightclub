@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "@/auth";
 import { getDatabase } from "@/lib/database";
-import { updatePendingReservation } from "@/lib/reservations/update";
+import { updateReservationSchedule } from "@/lib/reservations/update";
 import { ReservationRuleError, reservationRules } from "@/lib/reservations/rules";
 import { ReservationConflictError } from "@/lib/reservations/create";
 
@@ -37,7 +37,7 @@ export async function PATCH(
   }
 
   try {
-    const reservation = await updatePendingReservation(getDatabase(), id, {
+    const reservation = await updateReservationSchedule(getDatabase(), id, {
       serviceDate,
       startTime,
       durationHours: durationHours as 2 | 3 | 4 | 5,
@@ -50,7 +50,7 @@ export async function PATCH(
     if (error instanceof Error && error.message === "Reservation not found.") {
       return NextResponse.json({ error: error.message }, { status: 404 });
     }
-    if (error instanceof Error && error.message === "Only pending reservations can be edited.") {
+    if (error instanceof Error && error.message === "Only pending or confirmed reservations can be edited.") {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
     console.error("Reservation edit failed", error);

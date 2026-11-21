@@ -57,7 +57,7 @@ export function EditReservationButton({
         setMessage(data.error ?? "Could not edit reservation.");
         return;
       }
-      setMessage("Updated — review and confirm the reservation");
+      setMessage("Reservation updated.");
       setEditing(false);
       window.location.reload();
     } catch {

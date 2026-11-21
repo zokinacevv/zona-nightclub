@@ -6,7 +6,7 @@ import {
 } from "@/lib/reservations/rules";
 import { ReservationConflictError } from "@/lib/reservations/create";
 
-export async function updatePendingReservation(
+export async function updateReservationSchedule(
   database: PrismaClient,
   reservationId: string,
   input: {
@@ -29,8 +29,8 @@ export async function updatePendingReservation(
     });
 
     if (!existing) throw new Error("Reservation not found.");
-    if (existing.status !== "PENDING") {
-      throw new Error("Only pending reservations can be edited.");
+    if (existing.status !== "PENDING" && existing.status !== "CONFIRMED") {
+      throw new Error("Only pending or confirmed reservations can be edited.");
     }
 
     const [reservationConflict, availabilityBlockConflict] = await Promise.all([

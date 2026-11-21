@@ -4,7 +4,7 @@ import { formatInTimeZone } from "date-fns-tz";
 import {
   ReservationRuleError,
   createReservationWindow,
-  hasReservationBufferConflict,
+  hasTurnoverBufferConflict,
   reservationRules,
 } from "@/lib/reservations/rules";
 
@@ -97,7 +97,7 @@ test("allows Sunday reservations that finish at 23:00 but rejects later ones", (
   );
 });
 
-test("keeps the 90-minute buffer before and after confirmed reservations", () => {
+test("keeps the 90-minute buffer before and after reservations and blocked terms", () => {
   const reservation = createReservationWindow(
     {
       serviceDate: "2026-11-28",
@@ -139,8 +139,8 @@ test("keeps the 90-minute buffer before and after confirmed reservations", () =>
     now,
   );
 
-  assert.equal(hasReservationBufferConflict(endsAtBufferStart, reservation), false);
-  assert.equal(hasReservationBufferConflict(overlapsPreBuffer, reservation), true);
-  assert.equal(hasReservationBufferConflict(overlapsPostBuffer, reservation), true);
-  assert.equal(hasReservationBufferConflict(startsAtBufferEnd, reservation), false);
+  assert.equal(hasTurnoverBufferConflict(endsAtBufferStart, reservation), false);
+  assert.equal(hasTurnoverBufferConflict(overlapsPreBuffer, reservation), true);
+  assert.equal(hasTurnoverBufferConflict(overlapsPostBuffer, reservation), true);
+  assert.equal(hasTurnoverBufferConflict(startsAtBufferEnd, reservation), false);
 });

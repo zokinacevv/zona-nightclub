@@ -56,7 +56,7 @@ export function reservationBufferRange(reservation: ReservationTimeRange) {
   };
 }
 
-export function hasReservationBufferConflict(
+export function hasTurnoverBufferConflict(
   requested: ReservationTimeRange,
   existing: ReservationTimeRange,
 ) {

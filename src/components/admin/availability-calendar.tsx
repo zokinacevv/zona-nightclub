@@ -249,14 +249,13 @@ export function AvailabilityCalendar() {
     );
     const overlaps = (existingStart: string, existingEnd: string) =>
       new Date(existingStart) < endsAt && new Date(existingEnd) > startsAt;
+    const bufferedRange = (existingStart: string, existingEnd: string) => [
+      new Date(new Date(existingStart).getTime() - turnoverBufferMs).toISOString(),
+      new Date(new Date(existingEnd).getTime() + turnoverBufferMs).toISOString(),
+    ] as const;
     return (
-      reservations.some((reservation) =>
-        overlaps(
-          new Date(new Date(reservation.startsAt).getTime() - turnoverBufferMs).toISOString(),
-          new Date(new Date(reservation.endsAt).getTime() + turnoverBufferMs).toISOString(),
-        ),
-      ) ||
-      blocks.some((block) => overlaps(block.startsAt, block.endsAt))
+      reservations.some((reservation) => overlaps(...bufferedRange(reservation.startsAt, reservation.endsAt))) ||
+      blocks.some((block) => overlaps(...bufferedRange(block.startsAt, block.endsAt)))
     );
   }
 

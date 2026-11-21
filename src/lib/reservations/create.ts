@@ -56,8 +56,8 @@ export async function createWebsiteReservation(
       }),
       transaction.availabilityBlock.findFirst({
         where: {
-          startsAt: { lt: window.blockedUntil },
-          endsAt: { gt: window.startsAt },
+          startsAt: { lt: reservationRange.endsAt },
+          endsAt: { gt: reservationRange.startsAt },
         },
         select: { id: true },
       }),

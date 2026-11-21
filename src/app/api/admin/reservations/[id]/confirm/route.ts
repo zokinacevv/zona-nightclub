@@ -52,8 +52,8 @@ export async function POST(
         }),
         transaction.availabilityBlock.findFirst({
           where: {
-            startsAt: { lt: pending.blockedUntil },
-            endsAt: { gt: pending.startsAt },
+            startsAt: { lt: reservationRange.endsAt },
+            endsAt: { gt: reservationRange.startsAt },
           },
           select: { id: true },
         }),

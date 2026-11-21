@@ -3,7 +3,7 @@ import { ReservationStatus } from "@/generated/prisma/client";
 import {
   createReservationWindow,
   getServiceHours,
-  hasReservationBufferConflict,
+  hasTurnoverBufferConflict,
   ReservationRuleError,
   reservationBufferRange,
   reservationRules,
@@ -82,16 +82,6 @@ function getCandidateWindows(
   });
 }
 
-function overlapsAvailabilityBlock(
-  requested: ReservationWindow,
-  existing: AvailabilityBlockConflict,
-) {
-  return (
-    existing.startsAt < requested.blockedUntil &&
-    existing.endsAt > requested.startsAt
-  );
-}
-
 function windowIsAvailable(
   window: ReservationWindow,
   reservations: ReservationConflict[],
@@ -99,10 +89,10 @@ function windowIsAvailable(
 ) {
   return (
     !reservations.some((reservation) =>
-      hasReservationBufferConflict(window, reservation),
+      hasTurnoverBufferConflict(window, reservation),
     ) &&
     !availabilityBlocks.some((availabilityBlock) =>
-      overlapsAvailabilityBlock(window, availabilityBlock),
+      hasTurnoverBufferConflict(window, availabilityBlock),
     )
   );
 }
@@ -141,8 +131,8 @@ async function getConflicts(
     }),
     database.availabilityBlock.findMany({
       where: {
-        startsAt: { lt: rangeEnd },
-        endsAt: { gt: rangeStart },
+        startsAt: { lt: reservationRange.endsAt },
+        endsAt: { gt: reservationRange.startsAt },
       },
       select: { endsAt: true, startsAt: true },
     }),

@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "@/auth";
 import { getDatabase } from "@/lib/database";
 import { ReservationStatus } from "@/generated/prisma/client";
-import { reservationBufferRange, reservationRules } from "@/lib/reservations/rules";
+import { reservationBufferRange } from "@/lib/reservations/rules";
 
 function monthRange(month: string) {
   if (!/^\d{4}-(?:0[1-9]|1[0-2])$/.test(month)) return null;
@@ -72,9 +72,6 @@ export async function POST(request: NextRequest) {
       { status: 400 },
     );
   const database = getDatabase();
-  const blockedUntil = new Date(
-    endsAt.getTime() + reservationRules.turnoverBufferMinutes * 60 * 1000,
-  );
   const reservationRange = reservationBufferRange({ startsAt, endsAt });
   const [reservationConflict, blockConflict] = await Promise.all([
     database.reservation.findFirst({
@@ -87,8 +84,8 @@ export async function POST(request: NextRequest) {
     }),
     database.availabilityBlock.findFirst({
       where: {
-        startsAt: { lt: blockedUntil },
-        endsAt: { gt: startsAt },
+        startsAt: { lt: reservationRange.endsAt },
+        endsAt: { gt: reservationRange.startsAt },
       },
       select: { id: true },
     }),

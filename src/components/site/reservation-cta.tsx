@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { ReservationCalendar } from "@/components/site/reservation-calendar";
 import { ReservationForm } from "@/components/site/reservation-form";
+import { useLanguage } from "@/lib/i18n";
 
 export function ReservationCta() {
-  const [durationHours, setDurationHours] = useState<2 | 3 | 4>(2);
+  const [durationHours, setDurationHours] = useState<2 | 3 | 4 | 5>(2);
   const [date, setDate] = useState<string>();
+  const { t } = useLanguage();
   return (
     <section
       id="reservations"
@@ -17,16 +19,16 @@ export function ReservationCta() {
           <div>
             <p className="flex items-center gap-3 text-xs font-bold tracking-[0.2em] text-accent uppercase">
               <span className="h-px w-10 bg-accent" />
-              Reservations
+              {t("Reservations")}
             </p>
             <h2 className="mt-4 max-w-3xl text-5xl font-black leading-[0.9] tracking-[-0.06em] text-foreground uppercase sm:text-7xl">
-              Make the night
-              <span className="block text-accent">yours.</span>
+              {t("Make the night")}
+              <span className="block text-accent">{t("yours")}</span>
             </h2>
           </div>
           <div className="max-w-sm text-center lg:translate-y-5 lg:pb-1">
             <p className="text-base leading-7 text-muted">
-              Choose your date, pick a time, and we’ll take care of the rest.
+              {t("Choose your date, pick a time, and we’ll take care of the rest.")}
             </p>
           </div>
         </div>
@@ -40,10 +42,10 @@ export function ReservationCta() {
         {date ? (
           <div className="mt-8 max-w-2xl border border-white/20 bg-background p-5">
             <p className="text-xs font-bold tracking-[0.18em] text-accent uppercase">
-              Choose duration
+              {t("Choose duration")}
             </p>
             <div className="mt-3 flex gap-2">
-              {([2, 3, 4] as const).map((duration) => (
+              {([2, 3, 4, 5] as const).map((duration) => (
                 <button
                   className={`min-h-10 border px-4 text-sm transition-colors ${duration === durationHours ? "border-accent bg-accent text-white" : "border-white/20 text-muted hover:border-white/50 hover:text-foreground"}`}
                   key={duration}

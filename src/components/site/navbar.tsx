@@ -3,18 +3,21 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
+import { useLanguage } from "@/lib/i18n";
 
 const navigationItems = [
   { href: "#top", label: "Home" },
   { href: "#about", label: "About" },
   { href: "#gallery", label: "Gallery" },
   { href: "#reservations", label: "Reservations" },
+  { href: "#shop", label: "Shop" },
   { href: "#contact", label: "Contact" },
 ];
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
+  const { language, setLanguage, t } = useLanguage();
 
   useEffect(() => {
     const updateScrollState = () => setHasScrolled(window.scrollY > 12);
@@ -70,7 +73,7 @@ export function Navbar() {
               href={item.href}
               key={item.href}
             >
-              {item.label}
+              {t(item.label)}
             </a>
           ))}
         </div>
@@ -80,8 +83,27 @@ export function Navbar() {
             className="inline-flex min-h-10 items-center justify-center rounded-sm bg-accent px-4 text-xs font-semibold tracking-[0.08em] text-white uppercase transition-colors hover:bg-[#ff201a] focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
             href="#reservations"
           >
-            BOOK YOUR NIGHT
+            {t("RESERVE NOW")}
           </a>
+          <button
+            aria-checked={language === "mk"}
+            aria-label="Switch language"
+            className="ml-3 inline-flex min-h-10 items-center gap-2 rounded-full border border-white/20 bg-white/5 px-2.5 text-[0.6rem] font-black tracking-[0.12em] text-white uppercase transition-colors hover:border-accent/70"
+            onClick={() => setLanguage(language === "en" ? "mk" : "en")}
+            role="switch"
+            type="button"
+          >
+            <span className={cn(language === "en" ? "text-white" : "text-white/40")}>EN</span>
+            <span className="relative h-5 w-9 rounded-full bg-black/70 ring-1 ring-white/20">
+              <span
+                className={cn(
+                  "absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-accent shadow-[0_0_12px_rgba(225,6,0,0.7)] transition-transform",
+                  language === "mk" ? "translate-x-4" : "translate-x-0.5",
+                )}
+              />
+            </span>
+            <span className={cn(language === "mk" ? "text-white" : "text-white/40")}>MK</span>
+          </button>
         </div>
 
         <button
@@ -133,7 +155,7 @@ export function Navbar() {
                   key={item.href}
                   onClick={() => setIsOpen(false)}
                 >
-                  {item.label}
+                  {t(item.label)}
                 </a>
               ))}
             </div>
@@ -142,8 +164,27 @@ export function Navbar() {
               href="#reservations"
               onClick={() => setIsOpen(false)}
             >
-              BOOK YOUR NIGHT
+              {t("RESERVE NOW")}
             </a>
+            <button
+              aria-checked={language === "mk"}
+              aria-label="Switch language"
+              className="mt-4 inline-flex min-h-11 items-center gap-3 rounded-full border border-white/20 bg-white/5 px-4 text-xs font-black tracking-[0.12em] text-white uppercase"
+              onClick={() => setLanguage(language === "en" ? "mk" : "en")}
+              role="switch"
+              type="button"
+            >
+              <span className={cn(language === "en" ? "text-white" : "text-white/40")}>EN</span>
+              <span className="relative h-5 w-9 rounded-full bg-black/70 ring-1 ring-white/20">
+                <span
+                  className={cn(
+                    "absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-accent shadow-[0_0_12px_rgba(225,6,0,0.7)] transition-transform",
+                    language === "mk" ? "translate-x-4" : "translate-x-0.5",
+                  )}
+                />
+              </span>
+              <span className={cn(language === "mk" ? "text-white" : "text-white/40")}>MK</span>
+            </button>
           </div>
         </div>
       </div>

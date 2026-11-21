@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
+import { useLanguage } from "@/lib/i18n";
 
 type DateAvailability = { date: string; available: boolean };
 
@@ -35,7 +36,7 @@ function datesForMonth(month: string) {
 }
 
 type ReservationCalendarProps = {
-  durationHours: 2 | 3 | 4;
+  durationHours: 2 | 3 | 4 | 5;
   onDateSelect: (date: string) => void;
 };
 
@@ -43,6 +44,7 @@ export function ReservationCalendar({
   durationHours,
   onDateSelect,
 }: ReservationCalendarProps) {
+  const { language, t } = useLanguage();
   const [firstMonth] = useState(() => currentMonth());
   const [month, setMonth] = useState(firstMonth);
   const [availability, setAvailability] = useState<Record<string, boolean>>({});
@@ -97,7 +99,7 @@ export function ReservationCalendar({
       <div className="flex items-center justify-between gap-4">
         <div>
           <p className="text-xs font-bold tracking-[0.18em] text-accent uppercase">
-            Choose a date
+            {t("Choose a date")}
           </p>
           <h3 className="mt-2 text-2xl font-semibold text-foreground">
             {monthLabel}
@@ -161,16 +163,16 @@ export function ReservationCalendar({
         })}
       </div>
       {isLoading ? (
-        <p className="mt-5 text-sm text-white/70">Loading dates…</p>
+        <p className="mt-5 text-sm text-white/70">{t("Loading dates…")}</p>
       ) : null}
       {error ? (
         <p className="mt-5 text-sm text-white/80" role="alert">
-          {error}
+          {language === "mk" ? "Достапноста е моментално недостапна. Обиди се повторно наскоро." : error}
         </p>
       ) : null}
       {selectedDate ? (
         <p className="mt-5 text-sm text-white">
-          Selected date: <span className="font-bold">{selectedDate}</span>
+          {language === "mk" ? "Избран датум:" : "Selected date:"} <span className="font-bold">{selectedDate}</span>
         </p>
       ) : null}
     </div>

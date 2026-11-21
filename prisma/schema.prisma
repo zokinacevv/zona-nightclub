@@ -42,6 +42,8 @@ model Reservation {
   status             ReservationStatus @default(PENDING)
   bookingSource      BookingSource     @default(WEBSITE)
   guestNotes         String?
+  termsAcceptedAt    DateTime?         @db.Timestamptz(6)
+  termsVersion       String?
   staffNotes         String?
   guestCancellationTokenExpiresAt DateTime? @db.Timestamptz(6)
   createdByUserId    String?

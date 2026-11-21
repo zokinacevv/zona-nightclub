@@ -1,6 +1,10 @@
+"use client";
+
 import Image from "next/image";
+import { useLanguage } from "@/lib/i18n";
 
 export function Hero() {
+  const { t } = useLanguage();
   return (
     <section className="relative isolate flex min-h-[calc(100svh-4.5rem)] items-start overflow-hidden border-b border-white/10 bg-background lg:items-end">
       <div
@@ -26,57 +30,57 @@ export function Hero() {
         <div className="absolute right-[10%] bottom-[17%] h-20 w-20 rounded-full bg-accent/70 blur-[70px]" />
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-5 pt-[32svh] pb-10 sm:px-8 sm:pt-[28svh] sm:pb-14 lg:px-10 lg:pt-24 lg:pb-16">
+      <div className="relative z-10 mx-auto flex min-h-[calc(100svh-4.5rem)] w-full max-w-7xl flex-col justify-between px-5 pt-4 pb-10 sm:px-8 sm:pt-6 sm:pb-14 lg:min-h-0 lg:px-10 lg:pt-24 lg:pb-16">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_14rem] lg:items-end">
-          <div className="text-center lg:text-left">
-            <p className="mb-3 text-4xl font-black leading-none tracking-[-0.07em] text-foreground uppercase sm:text-5xl">
-              This is
-            </p>
-            <h1 className="mx-auto max-w-5xl text-8xl font-black leading-[0.78] tracking-[-0.095em] text-foreground uppercase sm:text-9xl md:text-[10rem] lg:mx-0 lg:text-[12rem] xl:text-[14rem]">
-              ZONA
-            </h1>
-            <p className="mt-5 text-xs font-bold tracking-[0.35em] text-muted uppercase sm:text-sm">
-              Private club
-            </p>
+          <div className="flex min-h-[calc(100svh-8rem)] flex-col text-center lg:min-h-0 lg:block lg:text-left">
+            <div className="flex translate-y-8 justify-center sm:translate-y-10 lg:translate-y-0 lg:translate-x-28">
+              <Image
+                alt="ZONA Private Club"
+                className="h-auto w-full max-w-[34rem] object-contain lg:max-w-[48rem]"
+                height={809}
+                priority
+                src="/images/zona-mobile-logo.png"
+                width={1942}
+              />
+            </div>
             <p className="mt-8 hidden max-w-lg text-base leading-7 text-muted lg:block lg:text-lg">
-              A private club for great music, late conversations, and nights
-              that are only getting started.
+              {t("A private club for great music, late conversations, and nights that are only getting started.")}
             </p>
-            <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
+            <div className="mt-auto flex flex-col justify-center gap-3 pt-8 sm:flex-row lg:mt-9 lg:justify-start lg:pt-0">
               <a
                 className="inline-flex min-h-12 items-center justify-center rounded-sm bg-accent px-6 text-sm font-bold tracking-[0.1em] text-white uppercase transition-colors hover:bg-[#ff201a] focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
                 href="#reservations"
               >
-                BOOK YOUR NIGHT
+                {t("RESERVE NOW")}
               </a>
               <a
                 className="inline-flex min-h-12 items-center justify-center rounded-sm border border-white/30 px-6 text-sm font-bold tracking-[0.1em] text-foreground uppercase transition-colors hover:border-foreground hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
                 href="#about"
               >
-                Discover ZONA
+                {t("Discover ZONA")}
               </a>
             </div>
           </div>
 
           <div className="hidden border-l border-white/20 pl-5 xl:block xl:pb-2">
             <p className="text-xs font-bold tracking-[0.18em] text-accent uppercase">
-              After dark
+              {t("After dark")}
             </p>
             <p className="mt-3 text-2xl font-semibold leading-tight text-foreground">
-              Your night starts here.
+              {t("Your night starts here.")}
             </p>
             <a
               className="mt-5 inline-flex items-center gap-2 text-xs font-bold tracking-[0.14em] text-foreground uppercase transition-colors hover:text-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
               href="#reservations"
             >
-              Book your night
+              {t("Reserve now")}
             </a>
           </div>
         </div>
 
         <div className="mt-10 hidden items-center gap-4 text-[0.6875rem] font-bold tracking-[0.2em] text-muted uppercase sm:mt-20 sm:flex">
           <span className="h-px flex-1 bg-white/15" />
-          Scroll to enter
+          {t("Scroll to enter")}
           <span className="h-px w-8 bg-white/15" />
         </div>
       </div>

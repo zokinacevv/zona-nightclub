@@ -36,6 +36,7 @@ export async function POST(
     reservation,
     "CANCELLED",
     body.reason.trim(),
+    "admin",
   );
   return NextResponse.json({ reservation });
 }

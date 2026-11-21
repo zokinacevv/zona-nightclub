@@ -65,3 +65,33 @@ test("rejects bookings that end after closing", () => {
       error.code === "OUTSIDE_SERVICE_HOURS",
   );
 });
+
+test("allows Sunday reservations that finish at 23:00 but rejects later ones", () => {
+  const reservation = createReservationWindow(
+    {
+      serviceDate: "2026-10-04",
+      startTime: "20:00",
+      durationHours: 3,
+    },
+    now,
+  );
+
+  assert.equal(
+    formatInTimeZone(reservation.endsAt, reservationRules.timezone, "HH:mm"),
+    "23:00",
+  );
+  assert.throws(
+    () =>
+      createReservationWindow(
+        {
+          serviceDate: "2026-10-04",
+          startTime: "20:30",
+          durationHours: 3,
+        },
+        now,
+      ),
+    (error: unknown) =>
+      error instanceof ReservationRuleError &&
+      error.code === "OUTSIDE_SERVICE_HOURS",
+  );
+});

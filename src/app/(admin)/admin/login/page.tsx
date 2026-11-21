@@ -29,7 +29,7 @@ export default function AdminLoginPage() {
       >
         <div>
           <p className="text-xs font-bold tracking-[0.2em] text-accent uppercase">
-            NOIR staff
+            ZONA staff
           </p>
           <h1 className="mt-2 text-3xl font-semibold">Admin login</h1>
         </div>

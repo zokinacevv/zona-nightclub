@@ -115,9 +115,7 @@ async function getConflicts(
   const [reservations, availabilityBlocks] = await Promise.all([
     database.reservation.findMany({
       where: {
-        status: {
-          in: [ReservationStatus.PENDING, ReservationStatus.CONFIRMED],
-        },
+        status: ReservationStatus.CONFIRMED,
         startsAt: { lt: rangeEnd },
         blockedUntil: { gt: rangeStart },
       },
@@ -211,7 +209,7 @@ export function getBookingDuration(value: string | null): BookingDurationHours {
   ) {
     throw new ReservationRuleError(
       "DURATION_INVALID",
-      "Choose a reservation duration of 2, 3, or 4 hours.",
+      "Choose a reservation duration of 2, 3, 4, or 5 hours.",
     );
   }
 

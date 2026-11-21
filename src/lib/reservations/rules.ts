@@ -1,7 +1,7 @@
 import { addMinutes } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 
-export type BookingDurationHours = 2 | 3 | 4;
+export type BookingDurationHours = 2 | 3 | 4 | 5;
 export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 export type ServiceHours = {
@@ -11,13 +11,13 @@ export type ServiceHours = {
 
 export const reservationRules = {
   timezone: "Europe/Skopje",
-  allowedDurationsHours: [2, 3, 4] as const,
+  allowedDurationsHours: [2, 3, 4, 5] as const,
   slotIntervalMinutes: 30,
   turnoverBufferMinutes: 90,
   minimumAdvanceMinutes: 120,
   bookingWindowDays: 180,
   weeklySchedule: {
-    0: { opensAt: "13:00", closesAt: "00:00" },
+    0: { opensAt: "13:00", closesAt: "23:00" },
     1: { opensAt: "13:00", closesAt: "23:00" },
     2: { opensAt: "13:00", closesAt: "23:00" },
     3: { opensAt: "13:00", closesAt: "23:00" },
@@ -50,7 +50,8 @@ export class ReservationRuleError extends Error {
       | "TIME_INVALID"
       | "TOO_SOON"
       | "TOO_FAR_AHEAD"
-      | "OUTSIDE_SERVICE_HOURS",
+      | "OUTSIDE_SERVICE_HOURS"
+      | "TERMS_NOT_ACCEPTED",
     message: string,
   ) {
     super(message);
@@ -190,7 +191,7 @@ export function createReservationWindow(
   ) {
     throw new ReservationRuleError(
       "DURATION_INVALID",
-      "Reservations can last 2, 3, or 4 hours.",
+      "Reservations can last 2, 3, 4, or 5 hours.",
     );
   }
 

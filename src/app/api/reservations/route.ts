@@ -6,6 +6,7 @@ import {
   type CreateWebsiteReservationInput,
 } from "@/lib/reservations/create";
 import { sendReservationEmails } from "@/lib/reservations/email";
+import { reservationTermsVersion } from "@/lib/reservations/terms";
 import {
   ReservationRuleError,
   reservationRules,
@@ -23,6 +24,7 @@ type ReservationRequestBody = {
   startTime?: unknown;
   durationHours?: unknown;
   guestNotes?: unknown;
+  termsAccepted?: unknown;
 };
 
 function requiredText(value: unknown, fieldName: string) {
@@ -48,6 +50,13 @@ function parseRequestBody(
       ? body.guestNotes.trim()
       : undefined;
 
+  if (body.termsAccepted !== true) {
+    throw new ReservationRuleError(
+      "TERMS_NOT_ACCEPTED",
+      "You must accept the terms of use before making a reservation.",
+    );
+  }
+
   if (!/^\S+@\S+\.\S+$/.test(email)) {
     throw new ReservationRuleError(
       "DATE_INVALID",
@@ -65,7 +74,7 @@ function parseRequestBody(
   if (!reservationRules.allowedDurationsHours.includes(durationHours)) {
     throw new ReservationRuleError(
       "DURATION_INVALID",
-      "Choose a reservation duration of 2, 3, or 4 hours.",
+      "Choose a reservation duration of 2, 3, 4, or 5 hours.",
     );
   }
 
@@ -78,6 +87,8 @@ function parseRequestBody(
     startTime,
     durationHours,
     guestNotes,
+    termsAcceptedAt: new Date(),
+    termsVersion: reservationTermsVersion,
   };
 }
 

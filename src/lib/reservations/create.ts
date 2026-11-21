@@ -18,6 +18,8 @@ export type CreateWebsiteReservationInput = {
   startTime: string;
   durationHours: BookingDurationHours;
   guestNotes?: string;
+  termsAcceptedAt?: Date;
+  termsVersion?: string;
   bookingSource?: BookingSource;
   status?: ReservationStatus;
   createdByUserId?: string;
@@ -44,9 +46,7 @@ export async function createWebsiteReservation(
     const [existingReservation, availabilityBlock, previousGuestReservations] = await Promise.all([
       transaction.reservation.findFirst({
         where: {
-          status: {
-            in: [ReservationStatus.PENDING, ReservationStatus.CONFIRMED],
-          },
+          status: ReservationStatus.CONFIRMED,
           startsAt: { lt: window.blockedUntil },
           blockedUntil: { gt: window.startsAt },
         },
@@ -86,6 +86,8 @@ export async function createWebsiteReservation(
         bookingSource: input.bookingSource ?? BookingSource.WEBSITE,
         createdByUserId: input.createdByUserId,
         guestNotes: input.guestNotes,
+        termsAcceptedAt: input.termsAcceptedAt,
+        termsVersion: input.termsVersion,
         status: input.status ?? ReservationStatus.PENDING,
         guestCancellationTokenExpiresAt: window.startsAt,
       },

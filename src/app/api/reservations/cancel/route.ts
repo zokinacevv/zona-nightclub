@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyGuestCancellationToken } from "@/lib/reservations/cancellation";
 import { getDatabase } from "@/lib/database";
 import { sendReservationStatusEmail } from "@/lib/reservations/email";
+import {
+  cancellationFee,
+  formatReservationPrice,
+  reservationDurationHours,
+  reservationPrice,
+} from "@/lib/reservations/pricing";
 
 export const runtime = "nodejs";
 
@@ -43,6 +49,19 @@ export async function POST(request: NextRequest) {
       status: true, guestCancellationTokenExpiresAt: true,
     },
   });
-  await sendReservationStatusEmail(reservation, "CANCELLED", "Cancelled by guest");
-  return NextResponse.json({ message: "Reservation cancelled successfully." });
+  await sendReservationStatusEmail(
+    reservation,
+    "CANCELLED",
+    "Cancelled by guest",
+    "guest",
+  );
+  const price = reservationPrice(
+    reservationDurationHours(reservation.startsAt, reservation.endsAt),
+  );
+  const fee = cancellationFee(reservation.startsAt, price);
+  return NextResponse.json({
+    message: fee
+      ? `Reservation cancelled. Because it was cancelled less than 7 days before the reservation, 50% is payable: ${formatReservationPrice(fee)}.`
+      : "Reservation cancelled successfully.",
+  });
 }

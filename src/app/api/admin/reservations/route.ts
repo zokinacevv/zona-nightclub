@@ -28,8 +28,8 @@ export async function POST(request: NextRequest) {
   if (!Number.isInteger(partySize) || partySize < 1 || partySize > 250) {
     return NextResponse.json({ error: "Party size must be between 1 and 250." }, { status: 400 });
   }
-  if (![2, 3, 4].includes(durationHours)) {
-    return NextResponse.json({ error: "Choose a duration of 2, 3, or 4 hours." }, { status: 400 });
+  if (![2, 3, 4, 5].includes(durationHours)) {
+    return NextResponse.json({ error: "Choose a duration of 2, 3, 4, or 5 hours." }, { status: 400 });
   }
   try {
     const reservation = await createWebsiteReservation(getDatabase(), {
@@ -39,8 +39,11 @@ export async function POST(request: NextRequest) {
       partySize,
       serviceDate: String(body.serviceDate ?? ""),
       startTime: String(body.startTime ?? ""),
-      durationHours: durationHours as 2 | 3 | 4,
-      guestNotes: typeof body.guestNotes === "string" ? body.guestNotes.trim() : undefined,
+      durationHours: durationHours as 2 | 3 | 4 | 5,
+      guestNotes:
+        typeof body.guestNotes === "string" && body.guestNotes.trim()
+          ? body.guestNotes.trim()
+          : undefined,
       bookingSource: source,
       status: ReservationStatus.CONFIRMED,
       createdByUserId: session.user.id,

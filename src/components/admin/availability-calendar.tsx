@@ -247,12 +247,14 @@ export function AvailabilityCalendar() {
     const endsAt = new Date(
       startsAt.getTime() + nextDurationHours * 60 * 60 * 1000,
     );
-    const blockedUntil = new Date(endsAt.getTime() + turnoverBufferMs);
     const overlaps = (existingStart: string, existingEnd: string) =>
-      new Date(existingStart) < blockedUntil && new Date(existingEnd) > startsAt;
+      new Date(existingStart) < endsAt && new Date(existingEnd) > startsAt;
     return (
       reservations.some((reservation) =>
-        overlaps(reservation.startsAt, reservation.blockedUntil),
+        overlaps(
+          new Date(new Date(reservation.startsAt).getTime() - turnoverBufferMs).toISOString(),
+          new Date(new Date(reservation.endsAt).getTime() + turnoverBufferMs).toISOString(),
+        ),
       ) ||
       blocks.some((block) => overlaps(block.startsAt, block.endsAt))
     );

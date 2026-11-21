@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "@/auth";
 import { getDatabase } from "@/lib/database";
 import { ReservationStatus } from "@/generated/prisma/client";
-import { reservationRules } from "@/lib/reservations/rules";
+import { reservationBufferRange, reservationRules } from "@/lib/reservations/rules";
 
 function monthRange(month: string) {
   if (!/^\d{4}-(?:0[1-9]|1[0-2])$/.test(month)) return null;
@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Provide a valid month." }, { status: 400 });
 
   const database = getDatabase();
+  const reservationRange = reservationBufferRange(range);
   const [blocks, reservations] = await Promise.all([
     database.availabilityBlock.findMany({
       where: {
@@ -36,8 +37,8 @@ export async function GET(request: NextRequest) {
     database.reservation.findMany({
       where: {
         status: ReservationStatus.CONFIRMED,
-        startsAt: { lt: range.endsAt },
-        blockedUntil: { gt: range.startsAt },
+        startsAt: { lt: reservationRange.endsAt },
+        endsAt: { gt: reservationRange.startsAt },
       },
       orderBy: { startsAt: "asc" },
       select: { id: true, guestName: true, startsAt: true, endsAt: true, blockedUntil: true, status: true },
@@ -74,12 +75,13 @@ export async function POST(request: NextRequest) {
   const blockedUntil = new Date(
     endsAt.getTime() + reservationRules.turnoverBufferMinutes * 60 * 1000,
   );
+  const reservationRange = reservationBufferRange({ startsAt, endsAt });
   const [reservationConflict, blockConflict] = await Promise.all([
     database.reservation.findFirst({
       where: {
         status: ReservationStatus.CONFIRMED,
-        startsAt: { lt: blockedUntil },
-        blockedUntil: { gt: startsAt },
+        startsAt: { lt: reservationRange.endsAt },
+        endsAt: { gt: reservationRange.startsAt },
       },
       select: { id: true },
     }),

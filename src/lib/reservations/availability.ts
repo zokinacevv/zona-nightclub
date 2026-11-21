@@ -3,7 +3,9 @@ import { ReservationStatus } from "@/generated/prisma/client";
 import {
   createReservationWindow,
   getServiceHours,
+  hasReservationBufferConflict,
   ReservationRuleError,
+  reservationBufferRange,
   reservationRules,
   type BookingDurationHours,
   type ReservationWindow,
@@ -11,7 +13,7 @@ import {
 
 type ReservationConflict = Pick<
   Awaited<ReturnType<PrismaClient["reservation"]["findMany"]>>[number],
-  "startsAt" | "blockedUntil"
+  "startsAt" | "endsAt"
 >;
 
 type AvailabilityBlockConflict = Pick<
@@ -80,16 +82,28 @@ function getCandidateWindows(
   });
 }
 
-function overlaps(
+function overlapsAvailabilityBlock(
   requested: ReservationWindow,
-  existing: ReservationConflict | AvailabilityBlockConflict,
+  existing: AvailabilityBlockConflict,
 ) {
-  const existingEnd =
-    "blockedUntil" in existing ? existing.blockedUntil : existing.endsAt;
-
   return (
     existing.startsAt < requested.blockedUntil &&
-    existingEnd > requested.startsAt
+    existing.endsAt > requested.startsAt
+  );
+}
+
+function windowIsAvailable(
+  window: ReservationWindow,
+  reservations: ReservationConflict[],
+  availabilityBlocks: AvailabilityBlockConflict[],
+) {
+  return (
+    !reservations.some((reservation) =>
+      hasReservationBufferConflict(window, reservation),
+    ) &&
+    !availabilityBlocks.some((availabilityBlock) =>
+      overlapsAvailabilityBlock(window, availabilityBlock),
+    )
   );
 }
 
@@ -111,15 +125,19 @@ async function getConflicts(
       window.blockedUntil > latest ? window.blockedUntil : latest,
     windows[0].blockedUntil,
   );
+  const reservationRange = reservationBufferRange({
+    startsAt: rangeStart,
+    endsAt: rangeEnd,
+  });
 
   const [reservations, availabilityBlocks] = await Promise.all([
     database.reservation.findMany({
       where: {
         status: ReservationStatus.CONFIRMED,
-        startsAt: { lt: rangeEnd },
-        blockedUntil: { gt: rangeStart },
+        startsAt: { lt: reservationRange.endsAt },
+        endsAt: { gt: reservationRange.startsAt },
       },
-      select: { blockedUntil: true, startsAt: true },
+      select: { endsAt: true, startsAt: true },
     }),
     database.availabilityBlock.findMany({
       where: {
@@ -147,9 +165,7 @@ export async function getDayAvailability(
 
   return candidates.map(({ time, window }) => ({
     time,
-    available: ![...reservations, ...availabilityBlocks].some((existing) =>
-      overlaps(window, existing),
-    ),
+    available: windowIsAvailable(window, reservations, availabilityBlocks),
   }));
 }
 
@@ -191,10 +207,7 @@ export async function getMonthAvailability(
   return candidatesByDate.map(({ candidates, date }) => ({
     date,
     available: candidates.some(
-      ({ window }) =>
-        ![...reservations, ...availabilityBlocks].some((existing) =>
-          overlaps(window, existing),
-        ),
+      ({ window }) => windowIsAvailable(window, reservations, availabilityBlocks),
     ),
   }));
 }

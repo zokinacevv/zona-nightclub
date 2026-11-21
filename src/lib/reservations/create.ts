@@ -5,6 +5,7 @@ import {
 } from "@/generated/prisma/client";
 import {
   createReservationWindow,
+  reservationBufferRange,
   type BookingDurationHours,
 } from "@/lib/reservations/rules";
 import { createGuestCancellationToken } from "@/lib/reservations/cancellation";
@@ -41,14 +42,15 @@ export async function createWebsiteReservation(
     startTime: input.startTime,
     durationHours: input.durationHours,
   });
+  const reservationRange = reservationBufferRange(window);
 
   return database.$transaction(async (transaction) => {
     const [existingReservation, availabilityBlock, previousGuestReservations] = await Promise.all([
       transaction.reservation.findFirst({
         where: {
           status: ReservationStatus.CONFIRMED,
-          startsAt: { lt: window.blockedUntil },
-          blockedUntil: { gt: window.startsAt },
+          startsAt: { lt: reservationRange.endsAt },
+          endsAt: { gt: reservationRange.startsAt },
         },
         select: { id: true },
       }),

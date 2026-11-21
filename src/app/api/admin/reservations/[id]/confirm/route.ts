@@ -4,6 +4,7 @@ import { authOptions } from "@/auth";
 import { getDatabase } from "@/lib/database";
 import { sendReservationStatusEmail } from "@/lib/reservations/email";
 import { ReservationConflictError } from "@/lib/reservations/create";
+import { reservationBufferRange } from "@/lib/reservations/rules";
 
 export async function POST(
   _request: Request,
@@ -31,20 +32,21 @@ export async function POST(
     const reservation = await database.$transaction(async (transaction) => {
       const pending = await transaction.reservation.findUnique({
         where: { id },
-        select: { status: true, startsAt: true, blockedUntil: true },
+        select: { status: true, startsAt: true, endsAt: true, blockedUntil: true },
       });
       if (!pending) throw new Error("Not found");
       if (pending.status !== "PENDING") {
         throw new Error("Only pending reservations can be confirmed.");
       }
+      const reservationRange = reservationBufferRange(pending);
 
       const [reservationConflict, availabilityBlockConflict] = await Promise.all([
         transaction.reservation.findFirst({
           where: {
             id: { not: id },
             status: "CONFIRMED",
-            startsAt: { lt: pending.blockedUntil },
-            blockedUntil: { gt: pending.startsAt },
+            startsAt: { lt: reservationRange.endsAt },
+            endsAt: { gt: reservationRange.startsAt },
           },
           select: { id: true },
         }),

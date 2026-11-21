@@ -1,6 +1,7 @@
 import type { PrismaClient } from "@/generated/prisma/client";
 import {
   createReservationWindow,
+  reservationBufferRange,
   type BookingDurationHours,
 } from "@/lib/reservations/rules";
 import { ReservationConflictError } from "@/lib/reservations/create";
@@ -19,6 +20,7 @@ export async function updatePendingReservation(
     startTime: input.startTime,
     durationHours: input.durationHours,
   });
+  const reservationRange = reservationBufferRange(window);
 
   return database.$transaction(async (transaction) => {
     const existing = await transaction.reservation.findUnique({
@@ -36,8 +38,8 @@ export async function updatePendingReservation(
         where: {
           id: { not: reservationId },
           status: "CONFIRMED",
-          startsAt: { lt: window.blockedUntil },
-          blockedUntil: { gt: window.startsAt },
+          startsAt: { lt: reservationRange.endsAt },
+          endsAt: { gt: reservationRange.startsAt },
         },
         select: { id: true },
       }),

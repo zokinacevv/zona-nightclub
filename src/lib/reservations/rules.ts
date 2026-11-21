@@ -1,4 +1,4 @@
-import { addMinutes } from "date-fns";
+import { addMinutes, subMinutes } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 
 export type BookingDurationHours = 2 | 3 | 4 | 5;
@@ -40,6 +40,32 @@ export type ReservationWindow = {
   blockedUntil: Date;
   serviceHours: ServiceHours;
 };
+
+type ReservationTimeRange = Pick<ReservationWindow, "startsAt" | "endsAt">;
+
+export function reservationBufferRange(reservation: ReservationTimeRange) {
+  return {
+    startsAt: subMinutes(
+      reservation.startsAt,
+      reservationRules.turnoverBufferMinutes,
+    ),
+    endsAt: addMinutes(
+      reservation.endsAt,
+      reservationRules.turnoverBufferMinutes,
+    ),
+  };
+}
+
+export function hasReservationBufferConflict(
+  requested: ReservationTimeRange,
+  existing: ReservationTimeRange,
+) {
+  const protectedRange = reservationBufferRange(existing);
+  return (
+    requested.startsAt < protectedRange.endsAt &&
+    requested.endsAt > protectedRange.startsAt
+  );
+}
 
 export class ReservationRuleError extends Error {
   constructor(

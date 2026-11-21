@@ -4,6 +4,7 @@ import { formatInTimeZone } from "date-fns-tz";
 import {
   ReservationRuleError,
   createReservationWindow,
+  hasReservationBufferConflict,
   reservationRules,
 } from "@/lib/reservations/rules";
 
@@ -94,4 +95,52 @@ test("allows Sunday reservations that finish at 23:00 but rejects later ones", (
       error instanceof ReservationRuleError &&
       error.code === "OUTSIDE_SERVICE_HOURS",
   );
+});
+
+test("keeps the 90-minute buffer before and after confirmed reservations", () => {
+  const reservation = createReservationWindow(
+    {
+      serviceDate: "2026-11-28",
+      startTime: "17:00",
+      durationHours: 2,
+    },
+    now,
+  );
+  const endsAtBufferStart = createReservationWindow(
+    {
+      serviceDate: "2026-11-28",
+      startTime: "13:30",
+      durationHours: 2,
+    },
+    now,
+  );
+  const overlapsPreBuffer = createReservationWindow(
+    {
+      serviceDate: "2026-11-28",
+      startTime: "14:00",
+      durationHours: 2,
+    },
+    now,
+  );
+  const overlapsPostBuffer = createReservationWindow(
+    {
+      serviceDate: "2026-11-28",
+      startTime: "19:00",
+      durationHours: 2,
+    },
+    now,
+  );
+  const startsAtBufferEnd = createReservationWindow(
+    {
+      serviceDate: "2026-11-28",
+      startTime: "20:30",
+      durationHours: 2,
+    },
+    now,
+  );
+
+  assert.equal(hasReservationBufferConflict(endsAtBufferStart, reservation), false);
+  assert.equal(hasReservationBufferConflict(overlapsPreBuffer, reservation), true);
+  assert.equal(hasReservationBufferConflict(overlapsPostBuffer, reservation), true);
+  assert.equal(hasReservationBufferConflict(startsAtBufferEnd, reservation), false);
 });
